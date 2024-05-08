@@ -10,6 +10,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, f1_score, confusion_matrix
 from tensorflow.keras.optimizers import Adam
 from django.http import HttpResponse
+from django.template import RequestContext
 from django.template import loader
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -64,7 +65,7 @@ data = np.concatenate((real_currency_data, fake_currency_data), axis=0)
 labels = np.concatenate((real_currency_labels, fake_currency_labels), axis=0)
 
 #Input from the user
-image_path = input("Enter the path for the currency to be detected: ")  # /content/drive/MyDrive/500-rupee-new-note.jpg
+# image_path = input("Enter the path for the currency to be detected: ")  # /content/drive/MyDrive/500-rupee-new-note.jpg
 
 model = keras.Sequential([
     layers.Conv2D(32, (3, 3), activation='relu', input_shape=(image_size[0], image_size[1], 1)),
@@ -116,23 +117,23 @@ def predict_currency(image_path):
 
     return result
 
-img = predict_currency(image_path)
-print(img)
+# img = predict_currency(image_path)
+# print(img)
 
 # Load the original image
-original_image = cv2.imread(image_path)
+# original_image = cv2.imread(image_path)
 
 # Grayscale conversion
-gray_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
+# gray_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
 
 # Edge detection
-edges = cv2.Canny(gray_image, 100, 200)
+# edges = cv2.Canny(gray_image, 100, 200)
 
 # Segmentation (thresholding)
-_, thresholded_image = cv2.threshold(edges, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+# _, thresholded_image = cv2.threshold(edges, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
 # Create a canvas to display images side by side
-canvas = np.hstack([original_image, cv2.cvtColor(gray_image, cv2.COLOR_GRAY2BGR), cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR), cv2.cvtColor(thresholded_image, cv2.COLOR_GRAY2BGR)])
+# canvas = np.hstack([original_image, cv2.cvtColor(gray_image, cv2.COLOR_GRAY2BGR), cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR), cv2.cvtColor(thresholded_image, cv2.COLOR_GRAY2BGR)])
 
 # Close the displayed window manually
 cv2.waitKey(0)
@@ -155,7 +156,7 @@ print(f"Accuracy: {accuracy*100:.3f}%")
 print(f"Precision: {precision*100:.3f}%")
 print(f"F1 Score: {f1*100:.3f}%")
 
-print(confusion)
+# print(confusion)
 
 # Define the confusion matrix
 confusion_matrix = confusion
@@ -174,11 +175,24 @@ plt.title('VeriNote - Confusion Matrix')
 # Show the heatmap
 plt.show()
 
+def index(request):
+    template = loader.get_template('index.html')
+    if request.method == 'POST':
+        # Get the user input
+        image_path = request.POST.get('image_path')
+
+        # Perform currency prediction
+        prediction = predict_currency(image_path)
+        messageJ = {"prediction": prediction}
+
+        return HttpResponse(template.render(messageJ, request=request))
+    return HttpResponse(template.render({}, request))
+
 class CurrencyDetectionView(APIView):
 
     def get(self, request, *args, **kwargs):
         # image_path = input("Enter the path for the currency to be detected: ")
         template = loader.get_template('index.html')
-        messageJ = {"Result": img}
+        messageJ = {"Result": "img"}
         # return Response(messageJ)
         return HttpResponse(template.render(messageJ, request))
