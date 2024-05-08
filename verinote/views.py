@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import cv2
 import os
+import pytesseract
 
 def preprocess_image(image, image_size):
 
@@ -117,6 +118,8 @@ def predict_currency(image_path):
 
     return result
 
+
+
 # img = predict_currency(image_path)
 # print(img)
 
@@ -162,18 +165,18 @@ print(f"F1 Score: {f1*100:.3f}%")
 confusion_matrix = confusion
 
 # Create a heatmap for the confusion matrix
-plt.figure(figsize=(8, 6))
-sns.heatmap(confusion_matrix, annot=True, fmt='d', cmap='Blues', cbar=False,
-            xticklabels=['Predicted Negative', 'Predicted Positive'],
-            yticklabels=['Actual Negative', 'Actual Positive'])
+# plt.figure(figsize=(8, 6))
+# sns.heatmap(confusion_matrix, annot=True, fmt='d', cmap='Blues', cbar=False,
+#             xticklabels=['Predicted Negative', 'Predicted Positive'],
+#             yticklabels=['Actual Negative', 'Actual Positive'])
 
 # Add labels and title
-plt.xlabel('Predicted')
-plt.ylabel('Actual')
-plt.title('VeriNote - Confusion Matrix')
+# plt.xlabel('Predicted')
+# plt.ylabel('Actual')
+# plt.title('VeriNote - Confusion Matrix')
 
 # Show the heatmap
-plt.show()
+# plt.show()
 
 def index(request):
     template = loader.get_template('index.html')
